@@ -2,6 +2,7 @@ FROM ubuntu:latest
 LABEL authors="streak"
 
 RUN apt update -y
+RUN apt upgrade -y
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 RUN DEBIAN_FRONTEND=noninteractive
 RUN apt install -y \
@@ -30,6 +31,7 @@ RUN apt install -y \
 	qstat \
 	dnsutils \
 	smbclient
+
 # Building Nagios Core
 COPY nagios-4.5.7 /nagios-4.5.7
 WORKDIR /nagios-4.5.7
@@ -44,12 +46,14 @@ RUN ./configure --with-httpd-conf=/etc/apache2/sites-enabled && \
     make install-config && \
     make install-webconf && \
     a2enmod rewrite cgi
+
 # Building Nagios Plugins
 COPY nagios-plugins-2.4.11 /nagios-plugins-2.4.11
 WORKDIR /nagios-plugins-2.4.11
 RUN ./configure --with-nagios-user=nagios --with-nagios-group=nagios && \
     make && \
-    make install
+    make install \
+
 # Build and Install NRPE Plugins
 COPY nrpe-4.1.0 /nrpe-4.1.0
 WORKDIR /nrpe-4.1.0
@@ -57,8 +61,11 @@ RUN ./configure && \
     make all && \
     make install-plugin
 WORKDIR /root
+
+# Using Coolify the following is un-needed. Use the coolify env to set user / pass.
 # Copy the Nagios basic auth credentials set in the env file;
-COPY .env /usr/local/nagios/etc/
+#COPY .env /usr/local/nagios/etc/
+
 # Add Nagios and Apache Startup script
 ADD start.sh /
 RUN chmod +x /start.sh
