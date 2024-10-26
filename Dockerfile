@@ -27,10 +27,11 @@ RUN apt install -y \
 	libnet-snmp-perl \
 	gettext \
 	fping \
-        iputils-ping \
+    iputils-ping \
 	qstat \
 	dnsutils \
-	smbclient
+	smbclient \
+    postfix
 
 # Building Nagios Core
 COPY nagios-4.5.7 /nagios-4.5.7
