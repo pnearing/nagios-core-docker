@@ -52,7 +52,7 @@ COPY nagios-plugins-2.4.11 /nagios-plugins-2.4.11
 WORKDIR /nagios-plugins-2.4.11
 RUN ./configure --with-nagios-user=nagios --with-nagios-group=nagios && \
     make && \
-    make install \
+    make install
 
 # Build and Install NRPE Plugins
 COPY nrpe-4.1.0 /nrpe-4.1.0
@@ -60,6 +60,7 @@ WORKDIR /nrpe-4.1.0
 RUN ./configure && \
     make all && \
     make install-plugin
+
 WORKDIR /root
 
 # Using Coolify the following is un-needed. Use the coolify env to set user / pass.
