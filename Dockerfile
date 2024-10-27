@@ -30,7 +30,7 @@ RUN apt install -y \
     iputils-ping \
 	qstat \
 	dnsutils \
-	smbclient \
+	smbclient
 #    mailutils
 
 # Building Nagios Core
