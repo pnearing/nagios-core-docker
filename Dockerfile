@@ -31,7 +31,7 @@ RUN apt install -y \
 	qstat \
 	dnsutils \
 	smbclient \
-    mailutils
+#    mailutils
 
 # Building Nagios Core
 COPY nagios-4.5.7 /nagios-4.5.7
