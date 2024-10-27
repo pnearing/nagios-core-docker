@@ -65,7 +65,7 @@ RUN ./configure && \
 WORKDIR /root
 
 # Add google DNS to postfix resolf.conf
-RUN echo 'nameserver 8.8.8.8' > /var/spool/postfix/etc/resolv.conf
+#RUN echo 'nameserver 8.8.8.8' > /var/spool/postfix/etc/resolv.conf
 
 # Using Coolify the following is un-needed. Use the coolify env to set user / pass.
 # Copy the Nagios basic auth credentials set in the env file;
