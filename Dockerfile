@@ -68,8 +68,8 @@ WORKDIR /root
 
 # Configure msmtp
 COPY etc/msmtprc /etc/msmtprc
-RUN echo "user $POSTMARK_KEY" >> /etc/msmtprc
-RUN echo "password $POSTMARK_KEY" >> /etc/msmtprc
+RUN echo "user $POSTMARK_KEY" >> /etc/msmtprc # Set the var for building
+RUN echo "password $POSTMARK_KEY" >> /etc/msmtprc # Set the var for building
 
 # Using Coolify the following is un-needed. Use the coolify env to set user / pass.
 # Copy the Nagios basic auth credentials set in the env file;
