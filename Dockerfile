@@ -30,7 +30,9 @@ RUN apt install -y \
     iputils-ping \
 	qstat \
 	dnsutils \
-	smbclient
+	smbclient \
+    msmtp \
+    msmtp-mta
 #    mailutils
 
 # Building Nagios Core
@@ -64,8 +66,8 @@ RUN ./configure && \
 
 WORKDIR /root
 
-# Add google DNS to postfix resolf.conf
-#RUN echo 'nameserver 8.8.8.8' > /var/spool/postfix/etc/resolv.conf
+# Configure msmtp
+COPY etc/msmtprc /etc/msmtprc
 
 # Using Coolify the following is un-needed. Use the coolify env to set user / pass.
 # Copy the Nagios basic auth credentials set in the env file;
