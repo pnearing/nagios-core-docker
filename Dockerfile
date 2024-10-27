@@ -67,7 +67,7 @@ RUN ./configure && \
 WORKDIR /root
 
 # Configure msmtp
-COPY etc/msmtprc /etc/msmtprc
+
 
 # Using Coolify the following is un-needed. Use the coolify env to set user / pass.
 # Copy the Nagios basic auth credentials set in the env file;
