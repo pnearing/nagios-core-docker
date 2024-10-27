@@ -32,8 +32,8 @@ RUN apt install -y \
 	dnsutils \
 	smbclient \
     msmtp \
-    msmtp-mta
-#    mailutils
+    msmtp-mta \
+    mailutils
 
 # Building Nagios Core
 COPY nagios-4.5.7 /nagios-4.5.7
