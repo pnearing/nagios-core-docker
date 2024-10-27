@@ -31,7 +31,6 @@ RUN apt install -y \
 	qstat \
 	dnsutils \
 	smbclient \
-    postfix \
     mailutils
 
 # Building Nagios Core
