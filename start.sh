@@ -23,9 +23,6 @@ echo 'RedirectMatch ^/$ /nagios' >> /etc/apache2/apache2.conf
 # Start Nagios
 /etc/init.d/nagios start
 
-# Start postfix
-postfix start
-
 #Start Apache
 a2dissite 000-default default-ssl
 rm -rf /run/apache2/apache2.pid
