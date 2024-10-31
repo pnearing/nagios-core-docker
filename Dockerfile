@@ -74,13 +74,14 @@ RUN apt install -y nagios-plugins* nagios-snmp-plugins nagios-images
 #  1 or true, then the config for the default localhost 'host' is removed from nagios.cfg,
 #  otherwise 'localhost' is renamed to 'docker_container' to better describe what
 #  is actually being monitored. If localhost is disabled, then nagios will fail to run properly
-#  until you define a host.  This will also create the directories '/nagios_conf/',
+#  until you define a host. If localhost is enabled, then the SSH service will fail, since this
+#  container doesn't include a ssh daemon. This will also create the directories '/config/',
 #  which is added to the nagios.cfg to be a config directory to use as a volume mount point,
-#  and '/event_handlers/' to use as a volume mount point for custom event handlers, as well as
+#  '/event_handlers/' to use as a volume mount point for custom event handlers, as well as
 #  '/plugins/ to use as a volume mount point for custom plugins.  It also adds the apt plugin
-#  config directory, to add the commands for the apt installed plugins.  This will copy a
-#  customized commands.cfg file, removing duplicate commands that are also defined in
-#  /etc/nagios-plugins/config.
+#  config directory to the nagios.cfg, to add the commands for the apt installed plugins.
+#  This will copy a customized commands.cfg file, removing duplicate commands that are also
+#  defined in /etc/nagios-plugins/config.
 #
 #  In addition, this also adds the following custom variable/macros to the resources.cfg:
 #       $USER2$=/usr/lib/nagios/plugins;    The location apt installs nagios plugins.
