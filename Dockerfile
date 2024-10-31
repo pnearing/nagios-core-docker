@@ -71,6 +71,7 @@ RUN apt install -y nagios-plugins*
 # Configure nasios for conf.d directory, so we can quickly add hosts.
 # The directory /nagios_conf/ is added as a config directory to the nagios.cfg
 RUN mkdir /nagios_conf
+RUN sed -i 'cfg_file=/usr/local/nagios/etc/objects/localhost.cfg//'
 RUN echo "cfg_dir=/nagios_conf" >> /usr/local/nagios/etc/nagios.cfg
 RUN echo "\$USER2\$=/usr/lib/nagios/plugins" >> /usr/local/nagios/resource.cfg
 RUN echo "\$USER3\$=/usr/lib/nagios/plugins-rabbitmq" >> /usr/local/nagios/resource.cfg
