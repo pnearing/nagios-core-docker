@@ -18,6 +18,9 @@ mkdir /plugins
 # Add the config directory to the nagios config:
 echo "cfg_dir=/config" >> /usr/local/nagios/etc/nagios.cfg
 
+# Add the apt installed plugins config directory to nagios.cfg:
+echo "cfg_dir=/etc/nagios-plugins/config" >> /usr/local/nagios/etc/nagios.cfg
+
 # Add the installed directories to the resources.cfg, useable as
 #  $USER2$ for the default apt plugin location, $USER3$ for the rabbitmq plugin location,
 #  $USER4$ for custom event handlers location, and $USER5$ for custom plugin location.
