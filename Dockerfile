@@ -1,6 +1,7 @@
 FROM ubuntu:latest
-LABEL authors="streak"
-
+LABEL authors="Peter Nearing"
+# This docker file is rewritten by me, not originally created by me, I got it from an internet
+# tutorial.
 RUN apt update -y
 RUN apt upgrade -y
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -33,7 +34,8 @@ RUN apt install -y \
 	smbclient \
     msmtp \
     msmtp-mta \
-    mailutils
+    mailutils \
+    nagios-plugin*
 
 # Building Nagios Core
 COPY nagios-4.5.7 /nagios-4.5.7
@@ -58,25 +60,39 @@ RUN ./configure --with-nagios-user=nagios --with-nagios-group=nagios && \
     make install
 
 # Build and Install NRPE Plugins
-COPY nrpe-4.1.0 /nrpe-4.1.0
-WORKDIR /nrpe-4.1.0
-RUN ./configure && \
-    make all && \
-    make install-plugin
+#COPY nrpe-4.1.0 /nrpe-4.1.0
+#WORKDIR /nrpe-4.1.0
+#RUN ./configure && \
+#    make all && \
+#    make install-plugin
+
 
 WORKDIR /root
 
-# Configure msmtp
-COPY etc/msmtprc /etc/msmtprc
-RUN echo "user $POSTMARK_KEY" >> /etc/msmtprc # Set the var for building
-RUN echo "password $POSTMARK_KEY" >> /etc/msmtprc # Set the var for building
+# Configure nasios for conf.d directory, so we can quickly add hosts.
+# The directory /nagios_conf/ is added as a config directory to the nagios.cfg
+RUN mkdir /nagios_conf
 
-# Using Coolify the following is un-needed. Use the coolify env to set user / pass.
+COPY etc/nagios/nagios.cfg /usr/local/nagios/etc/nagios.cfg
+COPY etc/nagios/commands.cfg /usr/local/nagios/etc/objects/commands.cfg
+COPY etc/nagios/contacts.cfg /usr/local/nagios/etc/object/contacts.cfg
+COPY etc/nagios/templates.cfg /usr/local/nagios/etc/object/templates.cfg
+COPY etc/nagios/timeperiods.cfg /usr/local/nagios/etc/object/timeperiods.cfg
+
+# Configure msmtp
+COPY etc/msmtp/msmtprc /etc/msmtprc
+RUN echo "user $EMAIL_USERNAME" >> /etc/msmtprc # Set the var for building
+RUN echo "password $EMAIL_PASSWORD" >> /etc/msmtprc # Set the var for building
+
+# Using Coolify the following is un-needed. Use the coolify env to set
+# the variables NAGIOSADMIN_USER and NAGIOSADMIN_PASSWORD
 # Copy the Nagios basic auth credentials set in the env file;
 #COPY .env /usr/local/nagios/etc/
 
 # Add Nagios and Apache Startup script
 ADD start.sh /
 RUN chmod +x /start.sh
+
+EXPOSE 80
 
 CMD [ "/start.sh" ]
