@@ -72,7 +72,7 @@ RUN apt install -y nagios-plugins*
 # The directory /nagios_conf/ is added as a config directory to the nagios.cfg
 RUN mkdir /nagios_conf
 #RUN sed -i 's/^cfg_file=\/usr\/local\/nagios\/etc\/objects\/localhost.cfg$/#/' /usr/local/nagios/etc/nagios.cfg
-RUN sed -i 's/host_name               localhost/host_name               docker_container/' /usr/local/nagios/etc/objects/localhost.cfg
+RUN sed -i 's/localhost/docker_container/' /usr/local/nagios/etc/objects/localhost.cfg
 #COPY etc/nagios/internet.cfg /usr/local/nagios/etc/objects/internet.cfg
 #RUN echo "cfg_file=/usr/local/nagios/etc/objects/internet.cfg" >> /usr/local/nagios/etc/nagios.cfg
 RUN echo "cfg_dir=/nagios_conf" >> /usr/local/nagios/etc/nagios.cfg
