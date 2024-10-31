@@ -1,0 +1,122 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// NagiosQL
+//
+///////////////////////////////////////////////////////////////////////////////
+//
+// (c) 2005-2022 by Martin Willisegger
+//
+// Project   : NagiosQL
+// Component : Installations HowTo
+// Website   : https://sourceforge.net/projects/nagiosql/
+// Version   : 3.5.0
+// GIT Repo  : https://gitlab.com/wizonet/NagiosQL
+//
+///////////////////////////////////////////////////////////////////////////////
+
+====================
+= Vorraussetzungen =
+====================
+
+  * Webserver z.B. Apache 2.x
+  * MySQL/MariaDB 5.x oder neuer
+  * Nagios 2.x/3.x/4.x oder Nagios kompatible Monitoringsoftware
+	* PHP 7.2.0 oder groesser, inklusive:
+    * PHP Module: Session
+    * PHP Module: MySQLi
+    * PHP Module: gettext
+    * PHP Module: filter
+    * PHP Module: FTP (optional)
+    * PECL Erweiterung: SSH (optional)
+  * Javascript im Webbrowser zugelassen
+  * Empfohlener Webbrowser: Mozilla Firefox
+
+==============================================
+= Installation der ssh2 Erweiterung mit PHP8 =
+==============================================
+Benötigte RPM/Software:
+  * php8-pecl
+  * php8-devel
+  * libssh2-devel
+  * make
+
+Installation mit:
+# pecl install ssh2-1.3.1
+
+Konfiguration in php.ini:
+extension=ssh2
+
+===================
+= Neuinstallation =
+===================
+
+  1. Download und entpacken von NagiosQL 3.5 in einem Apache zugaenglichen Verzeichnis.
+  2. Der Installationsassistent wird automatisch durch Eingabe von install/index.php gestartet.
+  3. Die gewuenschte Sprache auswaehlen (siehe Appendix 2.)
+  4. Zum Installieren von NagiosQL den Anweisungen folgen.
+
+==================
+= AKTUALISIERUNG =
+==================
+
+  1. Aktualisierungen von NagiosQL 1.x und 2.x sind leider nicht moeglich, bitte einfach eine neue Installation starten und
+     dann die Nagios Konfiguration durch den Import einbinden.
+  2. Aktualisierungen von NagiosQL 3.x
+    a. Download und entpacken von NagiosQL 3.5 in ein NEUES Apache zugaenglichen Verzeichnis (DocumentRoot auf neues Verzeichnis
+	   aendern)
+	b. Wird dieselbe Apachekonfiguration verwendet (altes NagiosQL Verzeichnis wegkopieren, neues NagiosQL Verzeichnis bekommt
+	   denselben Namen), sollte der Apache Demon vor dem Upgrade neu gestartet werden.
+    c. Verschiebe die alte config/settings.php Datei in das neue NagiosQL 3.5 Verzeichnis config/
+	d. Die alte Datenbank manuell sichern (z.Bsp. mit mysqldump)
+    e. Der Installationsassistent wird durch den Aufruf von install/index.php gestartet
+    f. Die gewuenschte Sprache waehlen (siehe auch Appendix 1.) und den Anweisungen folgen
+
+=================
+= Konfiguration =
+=================
+  1. NagiosQL
+      a. Loggen Sie sich in Ihre neue NagiosQL Installation ein.
+      b. Ueberpruefen Sie die automatisch gesetzten Einstellungen unter: Administration => Einstellungen
+      c. Konfigurieren Sie die individuellen Nagios Einstellungen unter: Administration => Domains
+  2. Nagios
+    a. Ueberpruefen Sie, dass der Webserver Benutzer die Berechtigungen besitzt, die Nagios Ordner zu lesen und ggf. zu schreiben. Zum Testen "nagios -v" als Webserver Benutzer ausfuehren.
+       Tip: Den Webserver Benutzer der Gruppe Nagios zufuegen und der Gruppe die noetigen Rechte geben.
+    b. Aendern Sie alle "cfg_dir" und "cfg_file" Definitionen in der "nagios.cfg" wie folgt:
+
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/timeperiods.cfg
+          
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/commands.cfg
+          
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/contacts.cfg
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/contactgroups.cfg
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/contacttemplates.cfg
+
+          cfg_dir=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/hosts
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/hosttemplates.cfg
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/hostgroups.cfg
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/hostextinfo.cfg
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/hostescalations.cfg
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/hostdependencies.cfg          
+                    
+          cfg_dir=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/services
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/servicetemplates.cfg
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/servicegroups.cfg
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/serviceextinfo.cfg          
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/serviceescalations.cfg
+          cfg_file=<BASISORDNER WIE IN DER DOMAINKONFIGURATION>/servicedependencies.cfg
+
+================
+==== Pruefen ====
+================
+Oeffnen Sie nach erfolgter Installation die Support Seite unter Administration um die Installation zu pruefen und allfaellige Korrekturen festzustellen.                
+				      
+================
+=== Probleme ===
+================
+Zur Zeit gibt es keine bekannten Probleme. Support erreicht man ueber das Forum (https://sourceforge.net/projects/nagiosql/) oder fuer Programmfehler den Bugtracker (http://dev.nagigosql.org)
+
+================
+=== APPENDIX ===
+================
+  1. Zum Umstellen der Sprache muss das gewuenschte Encoding in den locales verfuegbar sein, z.B. de_DE.utf8. Das laesst sich an der Console ueber den Aufruf von "locale -a" herausfinden.
+  2. Bei Problemen mit der Sprachdarstellung oder fehlender Uebersetzung waehrend der Installation kann ein Apache Restart helfen
