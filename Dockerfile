@@ -60,11 +60,11 @@ RUN ./configure --with-nagios-user=nagios --with-nagios-group=nagios && \
     make install
 
 # Build and Install NRPE Plugins
-#COPY nrpe-4.1.0 /nrpe-4.1.0
-#WORKDIR /nrpe-4.1.0
-#RUN ./configure && \
-#    make all && \
-#    make install-plugin
+COPY nrpe-4.1.0 /nrpe-4.1.0
+WORKDIR /nrpe-4.1.0
+RUN ./configure && \
+    make all && \
+    make install-plugin
 
 
 WORKDIR /root
