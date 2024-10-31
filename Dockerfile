@@ -36,7 +36,8 @@ RUN apt install -y \
 	smbclient \
     msmtp \
     msmtp-mta \
-    mailutils
+    mailutils \
+    mariadb-server
 
 # Building Nagios Core
 COPY nagios-4.5.7 /nagios-4.5.7
@@ -66,6 +67,9 @@ WORKDIR /nrpe-4.1.0
 RUN ./configure && \
     make all && \
     make install-plugin
+
+
+
 
 # Install additional plugins, and images using apt:
 RUN apt install -y nagios-plugins* nagios-snmp-plugins nagios-images
