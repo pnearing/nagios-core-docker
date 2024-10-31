@@ -88,15 +88,17 @@ RUN apt install -y nagios-plugins* nagios-snmp-plugins nagios-images
 #       $USER3$=/usr/lib/nagios/plugins-rabbitmq;  The location apt installs the rabbitmq plugins.
 #       $USER4$=/event_handlers;    The location of custom event handlers.
 #       $USER5$=/plugins;       The location of custom plugins.
+#  The additional logos were downloaded from:
+#  https://exchange.nagios.org/directory/Graphics-and-Logos/Images-and-Logos/f_logos/details
 
 #ENV DISABLE_LOCALHOST=true
 
 WORKDIR /root
 COPY etc/nagios/commands.cfg /usr/local/nagios/etc/objects/commands.cfg
+COPY logos/f_logos /usr/local/nagios/share/image/logos/
 COPY configure_nagios.sh .
 RUN chmod +x configure_nagios.sh
 RUN ./configure_nagios.sh
-
 # Configure msmtp.  The environment variables EMAIL_HOST, EMAIL_FROM, EMAIL_USER and EMAIL_PASS,
 #  must be set as build environment variables.  This by default sets msmtp to use TLS, on port
 #  587,  If your setup requires different settings, this can be acheived by editing the file:
