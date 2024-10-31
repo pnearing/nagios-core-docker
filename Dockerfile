@@ -95,7 +95,7 @@ RUN apt install -y nagios-plugins* nagios-snmp-plugins nagios-images
 
 WORKDIR /root
 COPY etc/nagios/commands.cfg /usr/local/nagios/etc/objects/commands.cfg
-COPY logos/f_logos /usr/local/nagios/share/image/logos/
+COPY logos/f_logos /usr/local/nagios/share/images/logos/f_logos
 COPY configure_nagios.sh .
 RUN chmod +x configure_nagios.sh
 RUN ./configure_nagios.sh
