@@ -73,12 +73,16 @@ WORKDIR /root
 # Configure nasios for conf.d directory, so we can quickly add hosts.
 # The directory /nagios_conf/ is added as a config directory to the nagios.cfg
 RUN mkdir /nagios_conf
+RUN echo "cfgdir=/nagios_conf" >> /usr/local/nagios/etc/nagios.cfg
+RUN echo "\$USER2\$=/usr/lib/nagios/plugins" >> /usr/local/nagios/resource.cfg
+RUN echo "\$USER3\$=/usr/lib/nagios/plugins-rabbitmq" >> /usr/local/nagios/resource.cfg
 
-COPY etc/nagios/nagios.cfg /usr/local/nagios/etc/nagios.cfg
-COPY etc/nagios/commands.cfg /usr/local/nagios/etc/objects/commands.cfg
-COPY etc/nagios/contacts.cfg /usr/local/nagios/etc/object/contacts.cfg
-COPY etc/nagios/templates.cfg /usr/local/nagios/etc/object/templates.cfg
-COPY etc/nagios/timeperiods.cfg /usr/local/nagios/etc/object/timeperiods.cfg
+#COPY etc/nagios/nagios.cfg /usr/local/nagios/etc/nagios.cfg
+#COPY etc/nagios/resource.cfg /usr/local/nagios/etc/resource.cfg
+#COPY etc/nagios/commands.cfg /usr/local/nagios/etc/objects/commands.cfg
+#COPY etc/nagios/contacts.cfg /usr/local/nagios/etc/object/contacts.cfg
+#COPY etc/nagios/templates.cfg /usr/local/nagios/etc/object/templates.cfg
+#COPY etc/nagios/timeperiods.cfg /usr/local/nagios/etc/object/timeperiods.cfg
 
 # Configure msmtp
 COPY etc/msmtp/msmtprc /etc/msmtprc
