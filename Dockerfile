@@ -67,16 +67,20 @@ RUN ./configure && \
     make all && \
     make install-plugin
 
-# Install additional plugins:
+# Install additional plugins using apt:
 RUN apt install -y nagios-plugins*
 
 # Configure nagios, if the environment variable DISABLE_LOCALHOST is set to either
-#  1 or true, then the config for the default localhost is removed from nagios.cfg,
+#  1 or true, then the config for the default localhost 'host' is removed from nagios.cfg,
 #  otherwise 'localhost' is renamed to 'docker_container' to better describe what
-#  is actually being monitored. This will also create the directories '/nagios_conf/',
-#  which is set in the nagios.cfg to be a config directory to use as a volume mount point,
+#  is actually being monitored. If localhost is disabled, then nagios will fail to run properly
+#  until you define a host.  This will also create the directories '/nagios_conf/',
+#  which is added to the nagios.cfg to be a config directory to use as a volume mount point,
 #  and '/event_handlers/' to use as a volume mount point for custom event handlers, as well as
-#  '/plugins/ to use as a volume mount point for custom plugins.
+#  '/plugins/ to use as a volume mount point for custom plugins.  It also adds the apt plugin
+#  config directory, to add the commands for the apt installed plugins.  This will copy a
+#  customized commands.cfg file, removing duplicate commands that are also defined in
+#  /etc/nagios-plugins/config.
 #
 #  In addition, this also adds the following custom variable/macros to the resources.cfg:
 #       $USER2$=/usr/lib/nagios/plugins;    The location apt installs nagios plugins.
@@ -87,15 +91,23 @@ RUN apt install -y nagios-plugins*
 #ENV DISABLE_LOCALHOST=true
 
 WORKDIR /root
+COPY etc/nagios/commands.cfg /usr/local/nagios/etc/objects/commands.cfg
 COPY configure_nagios.sh .
 RUN chmod +x configure_nagios.sh
 RUN ./configure_nagios.sh
 
-# Configure msmtp, EMAIL_USER and EMAIL_PASS, should be set to your smtp username and password,
-#  and passed as build environment variables.
+# Configure msmtp.  The environment variables EMAIL_HOST, EMAIL_FROM, EMAIL_USER and EMAIL_PASS,
+#  must be set as build environment variables.  This by default sets msmtp to use TLS, on port
+#  587,  If your setup requires different settings, this can be acheived by editing the file:
+#  etc/msmtp/msmtprc directly.
+#       EMAIL_HOST=<your smtp relay hostname / address>
+#       EMAIL_FROM=<the from address for all outgoing email.>
+#       EMAIL_USER=<your smtp username>
+#       EMAIL_PASS=<your smtp password>
 COPY etc/msmtp/msmtprc /etc/msmtprc
-RUN echo "user $EMAIL_USER" >> /etc/msmtprc
-RUN echo "password $EMAIL_PASS" >> /etc/msmtprc
+COPY configure_msmtp.sh .
+RUN chmod +x configure_msmtp.sh
+RUN ./configure_msmtp.sh
 
 # Using Coolify the following is un-needed. Use the coolify env variables to set
 # the variables NAGIOSADMIN_USER and NAGIOSADMIN_PASSWORD as build variables.
