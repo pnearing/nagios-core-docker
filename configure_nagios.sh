@@ -33,4 +33,5 @@ echo "default_statusmap_layout=6" >> /usr/local/nagios/etc/cgi.cfg
 
 # Copy the image directories from /usr/share/nagios/htdocs/images/logos/ ->
 #   /usr/local/nagios/share/images/logos/
-cp -ra /usr/share/nagios/htdocs/images/logos/* /usr/local/nagios/share/images/logos/
+cp -r /usr/share/nagios/htdocs/images/logos/* /usr/local/nagios/share/images/logos/
+chown -R --from root:root nagios:nagios /usr/local/nagios/share/images/logos
