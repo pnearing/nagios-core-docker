@@ -67,8 +67,8 @@ RUN ./configure && \
     make all && \
     make install-plugin
 
-# Install additional plugins using apt:
-RUN apt install -y nagios-plugins* nagios-snmp-plugins
+# Install additional plugins, and images using apt:
+RUN apt install -y nagios-plugins* nagios-snmp-plugins nagios-images
 
 # Configure nagios, if the environment variable DISABLE_LOCALHOST is set to either
 #  1 or true, then the config for the default localhost 'host' is removed from nagios.cfg,
