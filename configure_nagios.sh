@@ -9,7 +9,6 @@ else
   sed -i 's/localhost/nagios_container/' /usr/local/nagios/etc/objects/localhost.cfg
 fi
 
-
 # Make directories to hold configs, custom event handlers, and custom plugins:
 mkdir /config
 mkdir /event_handlers
@@ -28,3 +27,10 @@ echo "\$USER2\$=/usr/lib/nagios/plugins" >> /usr/local/nagios/resource.cfg
 echo "\$USER3\$=/usr/lib/nagios/plugins-rabbitmq" >> /usr/local/nagios/resource.cfg
 echo "\$USER4\$=/event_handlers"
 echo "\$USER5\$=/plugins"
+
+# Set the default satus map to circular (balloon):
+echo "default_statusmap_layout=6" >> /usr/local/nagios/etc/cgi.cfg
+
+# Copy the image directories from /usr/share/nagios/htdocs/images/logos/ ->
+#   /usr/local/nagios/share/images/logos/
+cp -ra /usr/share/nagios/htdocs/images/logos/* /usr/local/nagios/share/images/logos/
