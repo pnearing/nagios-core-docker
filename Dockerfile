@@ -35,7 +35,8 @@ RUN apt install -y \
     msmtp \
     msmtp-mta \
     mailutils \
-    nagios-plugin*
+    nagios-plugin* \
+    nrpe-ng
 
 # Building Nagios Core
 COPY nagios-4.5.7 /nagios-4.5.7
