@@ -86,8 +86,8 @@ RUN echo "\$USER3\$=/usr/lib/nagios/plugins-rabbitmq" >> /usr/local/nagios/resou
 
 # Configure msmtp
 COPY etc/msmtp/msmtprc /etc/msmtprc
-RUN echo "user $EMAIL_USERNAME" >> /etc/msmtprc # Set the var for building
-RUN echo "password $EMAIL_PASSWORD" >> /etc/msmtprc # Set the var for building
+RUN echo "user $EMAIL_USER" >> /etc/msmtprc # Set the var for building
+RUN echo "password $EMAIL_PASS" >> /etc/msmtprc # Set the var for building
 
 # Using Coolify the following is un-needed. Use the coolify env to set
 # the variables NAGIOSADMIN_USER and NAGIOSADMIN_PASSWORD
