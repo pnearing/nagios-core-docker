@@ -28,8 +28,8 @@ echo "\$USER3\$=/usr/lib/nagios/plugins-rabbitmq" >> /usr/local/nagios/resource.
 echo "\$USER4\$=/event_handlers"
 echo "\$USER5\$=/plugins"
 
-# Set the default satus map to circular (balloon):
-echo "default_statusmap_layout=6" >> /usr/local/nagios/etc/cgi.cfg
+# Set the default satus map to circular (Marked up):
+echo "default_statusmap_layout=5" >> /usr/local/nagios/etc/cgi.cfg
 
 # Copy the image directories from /usr/share/nagios/htdocs/images/logos/ ->
 #   /usr/local/nagios/share/images/logos/
