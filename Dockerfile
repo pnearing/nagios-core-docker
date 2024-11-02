@@ -247,12 +247,12 @@ RUN echo "\$USER3\$=/nagios_handlers" >> ${NAGIOS_HOME}/etc/rsource.cfg
 RUN echo "default_statusmap_layout=5" >> ${NAGIOS_HOME}/etc/cgi.cfg
 RUN echo "use_timezone=${NAGIOS_TIMEZONE}" >> ${NAGIOS_HOME}/etc/nagios.cfg
 RUN echo "cfg_dir=${NAGIOS_HOME}/etc/conf.d"
-RUN echo "" >> ${NAGIOS_HOME}/objects/templates.cfg &&\
-    echo "define service {" >> ${NAGIOS_HOME}/objects/templates.cfg &&\
-    echo "    name                  graphed-service" >> ${NAGIOS_HOME}/objects/templates.cfg &&\
-    echo "    action_url            /cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=day&rrdopts=-w+450+-j" >> ${NAGIOS_HOME}/objects/templates.cfg &&\
-    echo "    register              0" >> ${NAGIOS_HOME}/objects/templates.cfg &&\
-    echo "}"  >> ${NAGIOS_HOME}/objects/templates.cfg
+RUN echo "" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
+    echo "define service {" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
+    echo "    name                  graphed-service" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
+    echo "    action_url            /cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=day&rrdopts=-w+450+-j" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
+    echo "    register              0" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
+    echo "}"  >> ${NAGIOS_HOME}/etc/objects/templates.cfg
 
 
 # Copy example etc and var incase the user starts with and empty etc or var
