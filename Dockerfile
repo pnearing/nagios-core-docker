@@ -38,7 +38,7 @@ RUN apt update -y
 RUN apt upgrade -y
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 RUN DEBIAN_FRONTEND=noninteractive
-RUN apt install -y \
+RUN apt-get install -y \
     apache2 \
     apache2-utils \
     autoconf \
