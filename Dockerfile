@@ -20,7 +20,7 @@ ENV NAGIOS_CMD_USER=nagios
 ENV NAGIOS_CMD_GROUP=nagios
 ENV NAGIOS_TIMEZONE=America/Toronto
 ENV TZ=America/Toronto
-ENV DEBIAN_FRONTEND=noninteractive
+#ENV DEBIAN_FRONTEND=noninteractive
 ENV NG_NAGIOS_CONFIG_FILE=${NAGIOS_HOME}/etc/nagios.cfg
 ENV NG_CGI_DIR=${NAGIOS_HOME}/sbin
 ENV NG_WWW_DIR=${NAGIOS_HOME}/share/nagiosgraph
@@ -38,11 +38,11 @@ ENV NSCA_BRANCH=nsca-2.10.2
 ENV NAGIOSGRAPH_REPO=https://git.code.sf.net/p/nagiosgraph/git
 ENV NAGIOSTV_VERSION=0.9.2
 
-RUN apt update -y
-RUN apt upgrade -y
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-RUN DEBIAN_FRONTEND=noninteractive
-RUN apt-get install -y \
+RUN apt-get update -y
+RUN apt-get upgrade -y
+#RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+#RUN DEBIAN_FRONTEND=noninteractive
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     apache2 \
     apache2-utils \
     autoconf \
