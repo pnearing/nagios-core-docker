@@ -304,7 +304,7 @@ RUN ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/
 RUN ln -s /etc/apache2/conf-available/timezone.conf /etc/apache2/conf-enabled/timezone.conf
 RUN export DOC_ROOT="DocumentRoot $(echo $NAGIOS_HOME/share)"
 RUN sed -i "s,DocumentRoot.*,$DOC_ROOT," /etc/apache2/sites-enabled/000-default.conf
-RUN sed -i "s,</VirtualHost>,<IfDefine ENABLE_USR_LIB_CGI_BIN>\nScriptAlias /cgi-bin/ ${NAGIOS_HOME}/sbin/\n</IfDefine>\n</VirtualHost>," /etc/apache2/sites-enabled/000-default.conf
+RUN sed -i "s,</VirtualHost>,\tScriptAlias /cgi-bin/ ${NAGIOS_HOME}/sbin/\n</VirtualHost>," /etc/apache2/sites-enabled/000-default.conf
 #RUN ln -s /etc/apache2/mods-available/cgi.load /etc/apache2/mods-enabled/cgi.load
 
 # Enable apache modules:
