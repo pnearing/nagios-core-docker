@@ -253,7 +253,7 @@ RUN echo "" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "    action_url            /cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=day&rrdopts=-w+450+-j" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "    register              0" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "}"  >> ${NAGIOS_HOME}/etc/objects/templates.cfg
-RUN sed -i "s/command_name    process-service-perfdata/command_name    process-service-perfdata-old/" ${NAGIOS_HOME}/objects/commands.cfg
+RUN sed -i "s/command_name    process-service-perfdata/command_name    process-service-perfdata-old/" ${NAGIOS_HOME}/etc/objects/commands.cfg
 RUN echo "" >> ${NAGIOS_HOME}/etc/objects/commands.cfg &&\
     echo "define command {" >> ${NAGIOS_HOME}/etc/objects/commands.cfg &&\
     echo "    command_name    process-service-perfdata" >> ${NAGIOS_HOME}/etc/objects/commands.cfg &&\
