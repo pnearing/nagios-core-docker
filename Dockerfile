@@ -220,6 +220,7 @@ RUN ./install.pl --install \
 RUN cp share/nagiosgraph.ssi ${NAGIOS_HOME}/share/ssi/common-header.ssi
 WORKDIR /tmp
 RUN rm -rf nagiosgraph
+RUN cp -rp /opt/nagiosgraph/cgi/*.cgi ${NAGIOS_HOME}/sbin/
 
 # Install nagiostv:
 RUN wget https://github.com/chriscareycode/nagiostv-react/releases/download/v${NAGIOSTV_VERSION}/nagiostv-${NAGIOSTV_VERSION}.tar.gz
@@ -324,6 +325,9 @@ RUN a2enmod request
 # Add Nagios and Apache Startup script:
 ADD start.sh /
 RUN chmod +x /start.sh
+
+# Leave off in the /root dir:
+WORKDIR /root
 
 # Expose port 80
 EXPOSE 80
