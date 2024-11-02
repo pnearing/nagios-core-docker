@@ -261,7 +261,7 @@ RUN echo "" >> ${NAGIOS_HOME}/etc/objects/commands.cfg &&\
     echo "    command_line    /opt/nagiosgraph/bin/insert.pl" >> ${NAGIOS_HOME}/etc/objects/commands.cfg &&\
     echo "}" >> ${NAGIOS_HOME}/etc/objects/commands.cfg
 RUN sed -i "s/local-service/local-service,graphed-service/g" ${NAGIOS_HOME}/etc/objects/localhost.cfg
-RUN sed -i "s/email                   nagios@localhost/${PRIMARY_EMAIL}/" ${NAGIOS_HOME}/etc/objects/contacts.cfg
+RUN sed -i "s/email                   nagios@localhost/email                   ${PRIMARY_EMAIL}/" ${NAGIOS_HOME}/etc/objects/contacts.cfg
 
 # Copy example etc and var incase the user starts with and empty etc or var
 RUN mkdir -p /orig/etc
