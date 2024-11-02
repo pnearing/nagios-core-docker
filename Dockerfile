@@ -13,18 +13,13 @@ LABEL authors="Peter Nearing"
 #ENV EMAIL_USER=email_username
 #ENV EMAIL_PASS=secret_email_password
 
+ENV TZ=America/Toronto
 ENV NAGIOS_HOME=/opt/nagios
 ENV NAGIOS_USER=nagios
 ENV NAGIOS_GROUP=nagios
 ENV NAGIOS_CMD_USER=nagios
 ENV NAGIOS_CMD_GROUP=nagios
-ENV NAGIOS_TIMEZONE=America/Toronto
-ENV TZ=America/Toronto
-#ENV DEBIAN_FRONTEND=noninteractive
-ENV NG_NAGIOS_CONFIG_FILE=${NAGIOS_HOME}/etc/nagios.cfg
-ENV NG_CGI_DIR=${NAGIOS_HOME}/sbin
-ENV NG_WWW_DIR=${NAGIOS_HOME}/share/nagiosgraph
-ENV NG_CGI_URL=/cgi-bin
+ENV NAGIOS_TIMEZONE=$TZ
 ENV NAGIOS_CORE_REPO=https://github.com/NagiosEnterprises/nagioscore.git
 ENV NAGIOS_BRANCH=nagios-4.5.7
 ENV NAGIOS_PLUGINS_REPO=https://github.com/nagios-plugins/nagios-plugins.git
@@ -40,8 +35,6 @@ ENV NAGIOSTV_VERSION=0.9.2
 
 RUN apt-get update -y
 RUN apt-get upgrade -y
-#RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-#RUN DEBIAN_FRONTEND=noninteractive
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     apache2 \
     apache2-utils \
@@ -229,7 +222,7 @@ RUN rm -rf nagiosgraph
 
 # Install nagiostv:
 RUN wget https://github.com/chriscareycode/nagiostv-react/releases/download/v${NAGIOSTV_VERSION}/nagiostv-${NAGIOSTV_VERSION}.tar.gz
-RUN tar xf nagiostv-${NAGIOSTV_VERSION}.tar.gz -C /opt/nagios/share/
+RUN tar xf nagiostv-${NAGIOSTV_VERSION}.tar.gz -C ${NAGIOS_HOME}/share/
 RUN rm /tmp/nagiostv-${NAGIOSTV_VERSION}.tar.gz
 
 # Configure nagios. This will create the directories '/nagios_etc/', '/nagios_var/',
@@ -242,7 +235,8 @@ RUN rm /tmp/nagiostv-${NAGIOSTV_VERSION}.tar.gz
 #  https://exchange.nagios.org/directory/Graphics-and-Logos/Images-and-Logos/f_logos/details
 
 # Copy f_logos to logo directory:
-COPY logos/f_logos ${NAGIOS_HOME}/share/images/logos/
+RUN wget -O f_logos.tar.gz 'https://devexchange.nagios.org/components/com_mtree/attachment.php?link_id=7221&cf_id=24'
+RUN tar xzf f_logos.tar.gz -C ${NAGIOS_HOME}/share/images/logos/
 RUN chown -R ${NAGIOS_USER}:${NAGIOS_GROUP} ${NAGIOS_HOME}/share/images/logos
 
 # Set some default config options:
@@ -253,6 +247,13 @@ RUN echo "\$USER3\$=/nagios_handlers" >> ${NAGIOS_HOME}/etc/rsource.cfg
 RUN echo "default_statusmap_layout=5" >> ${NAGIOS_HOME}/etc/cgi.cfg
 RUN echo "use_timezone=${NAGIOS_TIMEZONE}" >> ${NAGIOS_HOME}/etc/nagios.cfg
 RUN echo "cfg_dir=${NAGIOS_HOME}/etc/conf.d"
+RUN echo "" >> ${NAGIOS_HOME}/objects/templates.cfg &&\
+    echo "define service {" >> ${NAGIOS_HOME}/objects/templates.cfg &&\
+    echo "    name                  graphed-service" >> ${NAGIOS_HOME}/objects/templates.cfg &&\
+    echo "    action_url            /cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=day&rrdopts=-w+450+-j" >> ${NAGIOS_HOME}/objects/templates.cfg &&\
+    echo "    register              0" >> ${NAGIOS_HOME}/objects/templates.cfg &&\
+    echo "}"  >> ${NAGIOS_HOME}/objects/templates.cfg
+
 
 # Copy example etc and var incase the user starts with and empty etc or var
 RUN mkdir -p /orig/etc
@@ -282,7 +283,7 @@ RUN rm -rf /opt/nagiosgraph/var && ln -s /nagiosgraph_var /opt/nagiosgraph/var
 #  must be set as build environment variables.  This by default sets msmtp to use TLS, on port
 #  587,  If your setup requires different settings, this can be acheived by editing the file:
 #  etc/msmtp/msmtprc directly.
-COPY etc/msmtp/msmtprc /etc/
+COPY etc/msmtprc /etc/
 RUN echo "host $EMAIL_HOST" >> /etc/msmtprc
 RUN echo "from $EMAIL_FROM" >> /etc/msmtprc
 RUN echo "user $EMAIL_USER" >> /etc/msmtprc
