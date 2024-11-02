@@ -4,35 +4,35 @@ LABEL authors="Peter Nearing"
 # This docker file is rewritten by me, not originally created by me; I got it from an internet
 # tutorial, I also didn't write start.sh.  All configurations, however were written by me.
 # And I'm also using https://github.com/JasonRivers/Docker-Nagios/ to mangle this together.
-
-ENV NAGIOS_HOME            /opt/nagios
-ENV NAGIOS_USER            nagios
-ENV NAGIOS_GROUP           nagios
-ENV NAGIOS_CMD_USER         nagios
-ENV NAGIOS_CMD_GROUP        nagios
-#ENV NAGIOS_FQDN            nagios.example.com
-#ENV NAGIOSADMIN_USER       nagiosadmin
-#ENV NAGIOSADMIN_PASS       nagios
-ENV APACHE_RUN_USER        www-data
-ENV APACHE_RUN_GROUP       www-data
-ENV NAGIOS_TIMEZONE        America/Toronto
-ENV DEBIAN_FRONTEND        noninteractive
-ENV NG_NAGIOS_CONFIG_FILE  ${NAGIOS_HOME}/etc/nagios.cfg
-ENV NG_CGI_DIR             ${NAGIOS_HOME}/sbin
-ENV NG_WWW_DIR             ${NAGIOS_HOME}/share/nagiosgraph
-ENV NG_CGI_URL             /cgi-bin
-ENV NAGIOS_CORE_REPO       https://github.com/NagiosEnterprises/nagioscore.git
-ENV NAGIOS_BRANCH          nagios-4.5.7
-ENV NAGIOS_PLUGINS_REPO    https://github.com/nagios-plugins/nagios-plugins.git
-ENV NAGIOS_PLUGINS_BRANCH  release-2.4.11
-ENV NRPE_REPO              https://github.com/NagiosEnterprises/nrpe.git
-ENV NRPE_BRANCH            nrpe-4.1.0
-
-ENV NCPA_BRANCH            v3.1.1
-
-ENV NSCA_BRANCH            nsca-2.10.2
-
-ENV NAGIOSTV_VERSION       0.9.2
+#ENV NAGIOS_FQDN=nagios.example.com
+#ENV NAGIOSADMIN_USER=nagiosadmin
+#ENV NAGIOSADMIN_PASS=nagios
+ENV NAGIOS_HOME=/opt/nagios
+ENV NAGIOS_USER=nagios
+ENV NAGIOS_GROUP=nagios
+ENV NAGIOS_CMD_USER=nagios
+ENV NAGIOS_CMD_GROUP=nagios
+ENV APACHE_RUN_USER=www-data
+ENV APACHE_RUN_GROUP=www-data
+ENV NAGIOS_TIMEZONE=America/Toronto
+ENV TZ=America/Toronto
+ENV DEBIAN_FRONTEND=noninteractive
+ENV NG_NAGIOS_CONFIG_FILE=${NAGIOS_HOME}/etc/nagios.cfg
+ENV NG_CGI_DIR=${NAGIOS_HOME}/sbin
+ENV NG_WWW_DIR=${NAGIOS_HOME}/share/nagiosgraph
+ENV NG_CGI_URL=/cgi-bin
+ENV NAGIOS_CORE_REPO=https://github.com/NagiosEnterprises/nagioscore.git
+ENV NAGIOS_BRANCH=nagios-4.5.7
+ENV NAGIOS_PLUGINS_REPO=https://github.com/nagios-plugins/nagios-plugins.git
+ENV NAGIOS_PLUGINS_BRANCH=release-2.4.11
+ENV NRPE_REPO=https://github.com/NagiosEnterprises/nrpe.git
+ENV NRPE_BRANCH=nrpe-4.1.0
+ENV NCPA_URL=https://raw.githubusercontent.com/NagiosEnterprises/ncpa
+ENV NCPA_BRANCH=v3.1.1
+ENV NCSA_REPO=https://github.com/NagiosEnterprises/nsca.git
+ENV NSCA_BRANCH=nsca-2.10.2
+ENV NAGIOSGRAPH_REPO=https://git.code.sf.net/p/nagiosgraph/git
+ENV NAGIOSTV_VERSION=0.9.2
 
 RUN apt update -y
 RUN apt upgrade -y
@@ -116,13 +116,14 @@ RUN apt install -y \
 RUN apt-get clean
 
 # Create the groups:
-RUN ( egrep -i "^${NAGIOS_GROUP}"    /etc/group || groupadd $NAGIOS_GROUP    )                         && \
-    ( egrep -i "^${NAGIOS_CMDGROUP}" /etc/group || groupadd $NAGIOS_CMDGROUP )
+RUN ( egrep -i "^${NAGIOS_GROUP}"    /etc/group || groupadd $NAGIOS_GROUP    )
+RUN ( egrep -i "^${NAGIOS_CMDGROUP}" /etc/group || groupadd $NAGIOS_CMDGROUP )
 
 # Create the users:
-RUN ( id -u $NAGIOS_USER    || useradd --system -d $NAGIOS_HOME -g $NAGIOS_GROUP    $NAGIOS_USER    )  && \
-    ( id -u $NAGIOS_CMDUSER || useradd --system -d $NAGIOS_HOME -g $NAGIOS_CMDGROUP $NAGIOS_CMDUSER )
+RUN ( id -u $NAGIOS_USER    || useradd --system -d $NAGIOS_HOME -g $NAGIOS_GROUP    $NAGIOS_USER    )
+RUN ( id -u $NAGIOS_CMDUSER || useradd --system -d $NAGIOS_HOME -g $NAGIOS_CMDGROUP $NAGIOS_CMDUSER )
 
+# Work in /tmp:
 WORKDIR /tmp
 
 # Build and install Nagios Core:
@@ -163,7 +164,7 @@ RUN ./configure \
     --with-ping6-command="/usr/bin/ping -6 -n -U -W %d -c %d %s" \
     --with-nagios-user="${NAGIOS_USER}" \
     --with-nagios-group="${NAGIOS_GROUP}" \
-    --with-openssl=auto \
+    --with-openssl=yes \
     --with-libmount
 RUN make && make install
 RUN mkdir -p /usr/lib/nagios/plugins &&\
@@ -189,16 +190,16 @@ WORKDIR /tmp
 RUN rm -rf nrpe
 
 # Fetch and install ncpa plugin:
-RUN wget -O ${NAGIOS_HOME}/libexec/check_ncpa.py https://raw.githubusercontent.com/NagiosEnterprises/ncpa/${NCPA_BRANCH}/client/check_ncpa.py  && \
+RUN wget -O ${NAGIOS_HOME}/libexec/check_ncpa.py ${NCPA_URL}/${NCPA_BRANCH}/client/check_ncpa.py  && \
     chmod +x ${NAGIOS_HOME}/libexec/check_ncpa.py
 
 # Build and install ncsa plugin:
-RUN git clone https://github.com/NagiosEnterprises/nsca.git
+RUN git clone ${NCSA_REPO}
 WORKDIR /tmp/nsca
 RUN git checkout ${NSCA_BRANCH}
 RUN ./configure \
-    --prefix=${NAGIOS_HOME}                                \
-    --with-nsca-user=${NAGIOS_USER}                        \
+    --prefix=${NAGIOS_HOME} \
+    --with-nsca-user=${NAGIOS_USER} \
     --with-nsca-grp=${NAGIOS_GROUP}
 RUN make all
 RUN cp src/nsca ${NAGIOS_HOME}/bin/
@@ -210,13 +211,13 @@ WORKDIR /tmp
 RUN rm -rf nsca
 
 # Install nagiosgraph:
-RUN git clone https://git.code.sf.net/p/nagiosgraph/git nagiosgraph
+RUN git clone ${NAGIOSGRAPH_REPO} nagiosgraph
 WORKDIR /tmp/nagiosgraph
-RUN ./install.pl --install                                      \
-        --prefix /opt/nagiosgraph                               \
-        --nagios-user ${NAGIOS_USER}                            \
-        --www-user www-data                               \
-        --nagios-perfdata-file ${NAGIOS_HOME}/var/perfdata.log  \
+RUN ./install.pl --install \
+        --prefix /opt/nagiosgraph \
+        --nagios-user ${NAGIOS_USER} \
+        --www-user www-data \
+        --nagios-perfdata-file ${NAGIOS_HOME}/var/perfdata.log \
         --nagios-cgi-url /cgi-bin
 RUN cp share/nagiosgraph.ssi ${NAGIOS_HOME}/share/ssi/common-header.ssi
 WORKDIR /tmp
@@ -246,14 +247,17 @@ RUN rm -rf nagiosgraph
 #  The additional logos were downloaded from:
 #  https://exchange.nagios.org/directory/Graphics-and-Logos/Images-and-Logos/f_logos/details
 
+RUN mv ${NAGIOS_HOME}/etc /nagios_etc
+RUN ln -s /nagios_etc ${NAGIOS_HOME}/etc
+
 #ENV DISABLE_LOCALHOST=true
 
-WORKDIR /root
-#COPY etc/nagios/commands.cfg ${NAGIOS_HOME}/etc/objects/commands.cfg
-COPY logos/f_logos ${NAGIOS_HOME}/share/images/logos/f_logos
-COPY configure_nagios.sh .
-RUN chmod +x configure_nagios.sh
-RUN ./configure_nagios.sh
+#WORKDIR /root
+##COPY etc/nagios/commands.cfg ${NAGIOS_HOME}/etc/objects/commands.cfg
+#COPY logos/f_logos ${NAGIOS_HOME}/share/images/logos/f_logos
+#COPY configure_nagios.sh .
+#RUN chmod +x configure_nagios.sh
+#RUN ./configure_nagios.sh
 
 
 
@@ -265,16 +269,23 @@ RUN ./configure_nagios.sh
 #       EMAIL_FROM=<the from address for all outgoing email.>
 #       EMAIL_USER=<your smtp username>
 #       EMAIL_PASS=<your smtp password>
-COPY etc/msmtp/msmtprc /etc/msmtprc
-COPY configure_msmtp.sh .
-RUN chmod +x configure_msmtp.sh
-RUN ./configure_msmtp.sh
+RUN echo "host $EMAIL_HOST" >> /etc/msmtprc
+RUN echo "from $EMAIL_FROM" >> /etc/msmtprc
+RUN echo "user $EMAIL_USER" >> /etc/msmtprc
+RUN echo "password $EMAIL_PASS" >> /etc/msmtprc
+
+# Set ServerName and timezone for Apache:
+RUN echo "ServerName ${NAGIOS_FQDN}" > /etc/apache2/conf-available/servername.conf
+RUN echo "PassEnv TZ" > /etc/apache2/conf-available/timezone.conf
+RUN ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf
+RUN ln -s /etc/apache2/conf-available/timezone.conf /etc/apache2/conf-enabled/timezone.conf
 
 # Using Coolify the following is un-needed. Use the coolify env variables to set
 # the variables NAGIOSADMIN_USER and NAGIOSADMIN_PASSWORD as build variables.
 # If not using Coolify uncomment this line and add a .env file to the project
-# root containing the afore-mentioned credential variables.
-#COPY .env /usr/local/nagios/etc/
+# root containing the afore-mentioned credential variables; Be sure to .gitignore the
+# .env file!
+#COPY .env ${NAGIOS_HOME}/etc/
 
 # Add Nagios and Apache Startup script:
 ADD start.sh /

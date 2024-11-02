@@ -4,6 +4,7 @@
 #  cfg_file line from the default nagios.cfg, otherwise, rename the localhost to
 #  nagios_container to better show what is being monitored.
 if [ "$DISABLE_LOCALHOST" -eq 1 ] || [ "$DISABLE_LOCALHOST" == "true" ]; then
+  echo "Disabling localhost"
   sed -i 's/cfg_file=\/usr\/local\/nagios\/etc\/objects\/localhost.cfg/#/' ${NAGIOS_HOME}/etc/nagios.cfg
 else
   sed -i 's/localhost/nagios_container/' "${NAGIOS_HOME}/etc/objects/localhost.cfg"
