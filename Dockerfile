@@ -188,39 +188,39 @@ RUN make clean
 WORKDIR /tmp
 RUN rm -rf nrpe
 
-## Fetch and install ncpa plugin:
-#RUN wget -O ${NAGIOS_HOME}/libexec/check_ncpa.py https://raw.githubusercontent.com/NagiosEnterprises/ncpa/${NCPA_BRANCH}/client/check_ncpa.py  && \
-#    chmod +x ${NAGIOS_HOME}/libexec/check_ncpa.py
+# Fetch and install ncpa plugin:
+RUN wget -O ${NAGIOS_HOME}/libexec/check_ncpa.py https://raw.githubusercontent.com/NagiosEnterprises/ncpa/${NCPA_BRANCH}/client/check_ncpa.py  && \
+    chmod +x ${NAGIOS_HOME}/libexec/check_ncpa.py
 
-## Build and install ncsa plugin:
-#RUN git clone https://github.com/NagiosEnterprises/nsca.git
-#WORKDIR /tmp/nsca
-#RUN git checkout ${NSCA_BRANCH}
-#RUN ./configure \
-#    --prefix=${NAGIOS_HOME}                                \
-#    --with-nsca-user=${NAGIOS_USER}                        \
-#    --with-nsca-grp=${NAGIOS_GROUP}
-#RUN make all
-#RUN cp src/nsca ${NAGIOS_HOME}/bin/
-#RUN cp src/send_nsca ${NAGIOS_HOME}/bin/
-#RUN cp sample-config/nsca.cfg ${NAGIOS_HOME}/etc/
-#RUN cp sample-config/send_nsca.cfg ${NAGIOS_HOME}/etc/
-#RUN sed -i 's/^#server_address.*/server_address=0.0.0.0/'  ${NAGIOS_HOME}/etc/nsca.cfg
-#WORKDIR /tmp
-#RUN rm -rf nsca
+# Build and install ncsa plugin:
+RUN git clone https://github.com/NagiosEnterprises/nsca.git
+WORKDIR /tmp/nsca
+RUN git checkout ${NSCA_BRANCH}
+RUN ./configure \
+    --prefix=${NAGIOS_HOME}                                \
+    --with-nsca-user=${NAGIOS_USER}                        \
+    --with-nsca-grp=${NAGIOS_GROUP}
+RUN make all
+RUN cp src/nsca ${NAGIOS_HOME}/bin/
+RUN cp src/send_nsca ${NAGIOS_HOME}/bin/
+RUN cp sample-config/nsca.cfg ${NAGIOS_HOME}/etc/
+RUN cp sample-config/send_nsca.cfg ${NAGIOS_HOME}/etc/
+RUN sed -i 's/^#server_address.*/server_address=0.0.0.0/'  ${NAGIOS_HOME}/etc/nsca.cfg
+WORKDIR /tmp
+RUN rm -rf nsca
 
-## Install nagiosgraph:
-#RUN git clone https://git.code.sf.net/p/nagiosgraph/git nagiosgraph
-#WORKDIR /tmp/nagiosgraph
-#RUN ./install.pl --install                                      \
-#        --prefix /opt/nagiosgraph                               \
-#        --nagios-user ${NAGIOS_USER}                            \
-#        --www-user www-data                               \
-#        --nagios-perfdata-file ${NAGIOS_HOME}/var/perfdata.log  \
-#        --nagios-cgi-url /cgi-bin
-#RUN cp share/nagiosgraph.ssi ${NAGIOS_HOME}/share/ssi/common-header.ssi
-#WORKDIR /tmp
-#RUN rm -rf nagiosgraph
+# Install nagiosgraph:
+RUN git clone https://git.code.sf.net/p/nagiosgraph/git nagiosgraph
+WORKDIR /tmp/nagiosgraph
+RUN ./install.pl --install                                      \
+        --prefix /opt/nagiosgraph                               \
+        --nagios-user ${NAGIOS_USER}                            \
+        --www-user www-data                               \
+        --nagios-perfdata-file ${NAGIOS_HOME}/var/perfdata.log  \
+        --nagios-cgi-url /cgi-bin
+RUN cp share/nagiosgraph.ssi ${NAGIOS_HOME}/share/ssi/common-header.ssi
+WORKDIR /tmp
+RUN rm -rf nagiosgraph
 
 
 
@@ -249,8 +249,8 @@ RUN rm -rf nrpe
 #ENV DISABLE_LOCALHOST=true
 
 WORKDIR /root
-COPY etc/nagios/commands.cfg /usr/local/nagios/etc/objects/commands.cfg
-COPY logos/f_logos /usr/local/nagios/share/images/logos/f_logos
+#COPY etc/nagios/commands.cfg ${NAGIOS_HOME}/etc/objects/commands.cfg
+COPY logos/f_logos ${NAGIOS_HOME}/share/images/logos/f_logos
 COPY configure_nagios.sh .
 RUN chmod +x configure_nagios.sh
 RUN ./configure_nagios.sh
