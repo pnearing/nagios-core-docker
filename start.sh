@@ -5,8 +5,6 @@ if [ -z "$(ls -A /nagios_etc)" ]; then
     echo "Started with empty ETC, copying example data in-place"
     cp -Rp /orig/etc/* /nagios_etc/
     chown ${NAGIOS_USER}:${NAGIOS_GROUP} /nagios_etc
-    echo "\$USER2\$=/nagios_handlers" >> /nagios_etc/resource.cfg
-    echo "\$USER3\$=/nagios_plugins" >> /nagios_etc/rsource.cfg
 fi
 
 if [ -z "$(ls -A /nagios_var)" ]; then

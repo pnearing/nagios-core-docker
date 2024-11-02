@@ -4,16 +4,20 @@ LABEL authors="Peter Nearing"
 # This docker file is rewritten by me, not originally created by me; I got it from an internet
 # tutorial, I also didn't write start.sh.  All configurations, however were written by me.
 # And I'm also using https://github.com/JasonRivers/Docker-Nagios/ to mangle this together.
+
 #ENV NAGIOS_FQDN=nagios.example.com
 #ENV NAGIOSADMIN_USER=nagiosadmin
 #ENV NAGIOSADMIN_PASS=nagios
+#ENV EMAIL_HOST=smtp.example.com
+#ENV EMAIL_FROM=monitoring@example.com
+#ENV EMAIL_USER=email_username
+#ENV EMAIL_PASS=secret_email_password
+
 ENV NAGIOS_HOME=/opt/nagios
 ENV NAGIOS_USER=nagios
 ENV NAGIOS_GROUP=nagios
 ENV NAGIOS_CMD_USER=nagios
 ENV NAGIOS_CMD_GROUP=nagios
-ENV APACHE_RUN_USER=www-data
-ENV APACHE_RUN_GROUP=www-data
 ENV NAGIOS_TIMEZONE=America/Toronto
 ENV TZ=America/Toronto
 ENV DEBIAN_FRONTEND=noninteractive
@@ -223,29 +227,32 @@ RUN cp share/nagiosgraph.ssi ${NAGIOS_HOME}/share/ssi/common-header.ssi
 WORKDIR /tmp
 RUN rm -rf nagiosgraph
 
+# Install nagiostv:
+RUN wget https://github.com/chriscareycode/nagiostv-react/releases/download/v${NAGIOSTV_VERSION}/nagiostv-${NAGIOSTV_VERSION}.tar.gz
+RUN tar xf nagiostv-${NAGIOSTV_VERSION}.tar.gz -C /opt/nagios/share/
+RUN rm /tmp/nagiostv-${NAGIOSTV_VERSION}.tar.gz
 
-
-
-# Configure nagios, if the environment variable DISABLE_LOCALHOST is set to either
-#  1 or true, then the config for the default localhost 'host' is removed from nagios.cfg,
-#  otherwise 'localhost' is renamed to 'docker_container' to better describe what
-#  is actually being monitored. If localhost is disabled, then nagios will fail to run properly
-#  until you define a host. If localhost is enabled, then the SSH service will fail, since this
-#  container doesn't include a ssh daemon. This will also create the directories '/config/',
-#  which is added to the nagios.cfg to be a config directory to use as a volume mount point,
-#  '/event_handlers/' to use as a volume mount point for custom event handlers, as well as
-#  '/plugins/ to use as a volume mount point for custom plugins.  It also adds the apt plugin
-#  config directory to the nagios.cfg, to add the commands for the apt installed plugins.
-#  This will copy a customized commands.cfg file, removing duplicate commands that are also
-#  defined in /etc/nagios-plugins/config.
+# Configure nagios. This will create the directories '/nagios_etc/', '/nagios_var/',
+#   '/nagios_plugins/', '/nagios_handlers/', '/nagiosgraph_etc/', '/nagiosgraph_var/,
+#   which are added as mount points for nagios / nagiosgraph config, var, custom plugins,
+#   and event handlers.  The /nagios_plugins, and /nagios_handlers are added to resources.cfg
+#   as $USER2$ and $USER3$, respectivly.
 #
-#  In addition, this also adds the following custom variable/macros to the resources.cfg:
-#       $USER2$=/usr/lib/nagios/plugins;    The location apt installs nagios plugins.
-#       $USER3$=/usr/lib/nagios/plugins-rabbitmq;  The location apt installs the rabbitmq plugins.
-#       $USER4$=/event_handlers;    The location of custom event handlers.
-#       $USER5$=/plugins;       The location of custom plugins.
 #  The additional logos were downloaded from:
 #  https://exchange.nagios.org/directory/Graphics-and-Logos/Images-and-Logos/f_logos/details
+
+# Copy f_logos to logo directory:
+COPY logos/f_logos ${NAGIOS_HOME}/share/images/logos/
+RUN chown -R ${NAGIOS_USER}:${NAGIOS_GROUP} ${NAGIOS_HOME}/share/images/logos
+
+# Set some default config options:
+RUN mkdir ${NAGIOS_HOME}/etc/conf.d
+RUN chown ${NAGIOS_USER}:${NAGIOS_GROUP} ${NAGIOS_HOME}/etc/conf.d
+RUN echo "\$USER2\$=/nagios_plugins" >> ${NAGIOS_HOME}/etc/resource.cfg
+RUN echo "\$USER3\$=/nagios_handlers" >> ${NAGIOS_HOME}/etc/rsource.cfg
+RUN echo "default_statusmap_layout=5" >> ${NAGIOS_HOME}/etc/cgi.cfg
+RUN echo "use_timezone=${NAGIOS_TIMEZONE}" >> ${NAGIOS_HOME}/etc/nagios.cfg
+RUN echo "cfg_dir=${NAGIOS_HOME}/etc/conf.d"
 
 # Copy example etc and var incase the user starts with and empty etc or var
 RUN mkdir -p /orig/etc
@@ -271,25 +278,11 @@ RUN rm -rf ${NAGIOS_HOME}/var && ln -s /nagios_var ${NAGIOS_HOME}/var
 RUN rm -rf /opt/nagiosgraph/etc && ln -s /nagiosgraph_etc /opt/nagiosgraph/etc
 RUN rm -rf /opt/nagiosgraph/var && ln -s /nagiosgraph_var /opt/nagiosgraph/var
 
-
-
-#ENV DISABLE_LOCALHOST=true
-
-#WORKDIR /root
-##COPY etc/nagios/commands.cfg ${NAGIOS_HOME}/etc/objects/commands.cfg
-#COPY logos/f_logos ${NAGIOS_HOME}/share/images/logos/f_logos
-#COPY configure_nagios.sh .
-#RUN chmod +x configure_nagios.sh
-#RUN ./configure_nagios.sh
-
 # Configure msmtp.  The environment variables EMAIL_HOST, EMAIL_FROM, EMAIL_USER and EMAIL_PASS,
 #  must be set as build environment variables.  This by default sets msmtp to use TLS, on port
 #  587,  If your setup requires different settings, this can be acheived by editing the file:
 #  etc/msmtp/msmtprc directly.
-#       EMAIL_HOST=<your smtp relay hostname / address>
-#       EMAIL_FROM=<the from address for all outgoing email.>
-#       EMAIL_USER=<your smtp username>
-#       EMAIL_PASS=<your smtp password>
+COPY etc/msmtp/msmtprc /etc/
 RUN echo "host $EMAIL_HOST" >> /etc/msmtprc
 RUN echo "from $EMAIL_FROM" >> /etc/msmtprc
 RUN echo "user $EMAIL_USER" >> /etc/msmtprc
