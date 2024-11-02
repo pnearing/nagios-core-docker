@@ -246,7 +246,7 @@ RUN echo "\$USER2\$=/nagios_plugins" >> ${NAGIOS_HOME}/etc/resource.cfg
 RUN echo "\$USER3\$=/nagios_handlers" >> ${NAGIOS_HOME}/etc/resource.cfg
 RUN echo "default_statusmap_layout=5" >> ${NAGIOS_HOME}/etc/cgi.cfg
 RUN echo "use_timezone=${NAGIOS_TIMEZONE}" >> ${NAGIOS_HOME}/etc/nagios.cfg
-RUN echo "cfg_dir=${NAGIOS_HOME}/etc/conf.d"
+RUN echo "cfg_dir=${NAGIOS_HOME}/etc/conf.d" >> ${NAGIOS_HOME}/etc/nagios.cfg
 RUN echo "" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "define service {" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "    name                  graphed-service" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
