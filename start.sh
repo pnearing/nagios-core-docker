@@ -26,7 +26,7 @@ if [ -z "$(ls -A /nagiosgraph_var)" ]; then
 fi
 
 # Update configuration files with the variable values:
-htpasswd -b -c $/nagios_etc/htpasswd.users "${NAGIOSADMIN_USER}" "${NAGIOSADMIN_PASSWORD}"
+htpasswd -b -c /nagios_etc/htpasswd.users "${NAGIOSADMIN_USER}" "${NAGIOSADMIN_PASSWORD}"
 sed -i "s/nagiosadmin/${NAGIOSADMIN_USER}/g" /nagios_etc/cgi.cfg
 
 # Redirect root URL (/) to /nagios
