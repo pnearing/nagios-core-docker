@@ -36,7 +36,7 @@ echo 'RedirectMatch ^/$ /nagios' >> /etc/apache2/apache2.conf
 /etc/init.d/nagios start
 
 #Start Apache
-a2dissite 000-default default-ssl
+#a2dissite 000-default default-ssl
 rm -rf /run/apache2/apache2.pid
 . /etc/apache2/envvars
 . /etc/default/apache-htcacheclean
