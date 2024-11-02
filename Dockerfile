@@ -251,7 +251,7 @@ RUN echo "cfg_dir=${NAGIOS_HOME}/etc/conf.d" >> ${NAGIOS_HOME}/etc/nagios.cfg
 RUN echo "" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "define service {" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "    name                  graphed-service" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
-    echo "    action_url            /cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=day&rrdopts=-w+450+-j" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
+    echo "    action_url            /cgi-bin/show.cgi?host=\$HOSTNAME\$&service=\$SERVICEDESC\$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/cgi-bin/showgraph.cgi?host=\$HOSTNAME\$&service=\$SERVICEDESC\$&period=day&rrdopts=-w+450+-j" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "    register              0" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "}"  >> ${NAGIOS_HOME}/etc/objects/templates.cfg
 RUN sed -i "s/command_name    process-service-perfdata/command_name    process-service-perfdata-old/" ${NAGIOS_HOME}/etc/objects/commands.cfg
