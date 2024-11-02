@@ -247,8 +247,31 @@ RUN rm -rf nagiosgraph
 #  The additional logos were downloaded from:
 #  https://exchange.nagios.org/directory/Graphics-and-Logos/Images-and-Logos/f_logos/details
 
-RUN mv ${NAGIOS_HOME}/etc /nagios_etc
-RUN ln -s /nagios_etc ${NAGIOS_HOME}/etc
+# Copy example etc and var incase the user starts with and empty etc or var
+RUN mkdir -p /orig/etc
+RUN mkdir -p /orig/var
+RUN mkdir -p /orig/graph-etc
+RUN mkdir -p /orig/graph-var
+RUN cp -rp ${NAGIOS_HOME}/etc/* /orig/etc/
+RUN cp -rp ${NAGIOS_HOME}/var/* /orig/var/
+RUN cp -rp /opt/nagiosgraph/etc/* /orig/graph-etc/
+RUN cp -rp /opt/nagiosgraph/var/* /orig/graph-var/
+
+# Make volume mount points for nagios and nagiosgraph
+RUN mkdir /nagios_etc
+RUN mkdir /nagios_var
+RUN mkdir /nagios_handlers
+RUN mkdir /nagios_plugins
+RUN mkdir /nagiosgraph_etc
+RUN mkdir /nagiosgraph_var
+
+# Remove and link nagios, and nagiosgraph etc and var to their mount points:
+RUN rm -rf ${NAGIOS_HOME}/etc && ln -s /nagios_etc ${NAGIOS_HOME}/etc
+RUN rm -rf ${NAGIOS_HOME}/var && ln -s /nagios_var ${NAGIOS_HOME}/var
+RUN rm -rf /opt/nagiosgraph/etc && ln -s /nagiosgraph_etc /opt/nagiosgraph/etc
+RUN rm -rf /opt/nagiosgraph/var && ln -s /nagiosgraph_var /opt/nagiosgraph/var
+
+
 
 #ENV DISABLE_LOCALHOST=true
 
@@ -258,8 +281,6 @@ RUN ln -s /nagios_etc ${NAGIOS_HOME}/etc
 #COPY configure_nagios.sh .
 #RUN chmod +x configure_nagios.sh
 #RUN ./configure_nagios.sh
-
-
 
 # Configure msmtp.  The environment variables EMAIL_HOST, EMAIL_FROM, EMAIL_USER and EMAIL_PASS,
 #  must be set as build environment variables.  This by default sets msmtp to use TLS, on port
@@ -280,6 +301,13 @@ RUN echo "PassEnv TZ" > /etc/apache2/conf-available/timezone.conf
 RUN ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf
 RUN ln -s /etc/apache2/conf-available/timezone.conf /etc/apache2/conf-enabled/timezone.conf
 
+# Enable apache modules:
+RUN a2enmod session
+RUN a2enmod session_cookie
+RUN a2enmod session_crypto
+RUN a2enmod auth_form
+RUN a2enmod request
+
 # Using Coolify the following is un-needed. Use the coolify env variables to set
 # the variables NAGIOSADMIN_USER and NAGIOSADMIN_PASSWORD as build variables.
 # If not using Coolify uncomment this line and add a .env file to the project
@@ -293,6 +321,14 @@ RUN chmod +x /start.sh
 
 # Expose port 80
 EXPOSE 80
+
+# Note volumes:
+VOLUME /nagios_etc
+VOLUME /nagios_var
+VOLUME /nagios_handlers
+VOLUME /nagios_plugins
+VOLUME /nagiosgraph_etc
+VOLUME /nagiosgraph_var
 
 # Set the entry point:
 CMD [ "/start.sh" ]
