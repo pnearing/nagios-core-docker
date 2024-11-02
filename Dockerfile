@@ -243,7 +243,7 @@ RUN chown -R ${NAGIOS_USER}:${NAGIOS_GROUP} ${NAGIOS_HOME}/share/images/logos
 RUN mkdir ${NAGIOS_HOME}/etc/conf.d
 RUN chown ${NAGIOS_USER}:${NAGIOS_GROUP} ${NAGIOS_HOME}/etc/conf.d
 RUN echo "\$USER2\$=/nagios_plugins" >> ${NAGIOS_HOME}/etc/resource.cfg
-RUN echo "\$USER3\$=/nagios_handlers" >> ${NAGIOS_HOME}/etc/rsource.cfg
+RUN echo "\$USER3\$=/nagios_handlers" >> ${NAGIOS_HOME}/etc/resource.cfg
 RUN echo "default_statusmap_layout=5" >> ${NAGIOS_HOME}/etc/cgi.cfg
 RUN echo "use_timezone=${NAGIOS_TIMEZONE}" >> ${NAGIOS_HOME}/etc/nagios.cfg
 RUN echo "cfg_dir=${NAGIOS_HOME}/etc/conf.d"
@@ -253,7 +253,13 @@ RUN echo "" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "    action_url            /cgi-bin/show.cgi?host=$HOSTNAME$&service=$SERVICEDESC$' onMouseOver='showGraphPopup(this)' onMouseOut='hideGraphPopup()' rel='/cgi-bin/showgraph.cgi?host=$HOSTNAME$&service=$SERVICEDESC$&period=day&rrdopts=-w+450+-j" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "    register              0" >> ${NAGIOS_HOME}/etc/objects/templates.cfg &&\
     echo "}"  >> ${NAGIOS_HOME}/etc/objects/templates.cfg
-
+RUN sed -i "s/command_name    process-service-perfdata/command_name    process-service-perfdata-old/" ${NAGIOS_HOME}/objects/commands.cfg
+RUN echo "" >> ${NAGIOS_HOME}/etc/objects/commands.cfg &&\
+    echo "define command {" >> ${NAGIOS_HOME}/etc/objects/commands.cfg &&\
+    echo "    command_name    process-service-perfdata" >> ${NAGIOS_HOME}/etc/objects/commands.cfg &&\
+    echo "    command_line    /opt/nagiosgraph/bin/insert.pl" >> ${NAGIOS_HOME}/etc/objects/commands.cfg &&\
+    echo "}" >> ${NAGIOS_HOME}/etc/objects/commands.cfg
+RUN sed -i "s/local-service/local-service, graphed-service/g" ${NAGIOS_HOME}/etc/objects/localhost.cfg
 
 # Copy example etc and var incase the user starts with and empty etc or var
 RUN mkdir -p /orig/etc
