@@ -2,9 +2,8 @@
 
 
 # Update configuration files with the variable values, considering overrides
-# shellcheck disable=SC2082
-htpasswd -b -c /opt/nagios/etc/htpasswd.users "${$NAGIOSADMIN_USER}" "${$NAGIOSADMIN_PASSWORD}"
-sed -i "s/nagiosadmin/${$NAGIOSADMIN_USER}/g" /usr/local/nagios/etc/cgi.cfg
+htpasswd -b -c /opt/nagios/etc/htpasswd.users "${NAGIOSADMIN_USER}" "${NAGIOSADMIN_PASSWORD}"
+sed -i "s/nagiosadmin/${NAGIOSADMIN_USER}/g" /usr/local/nagios/etc/cgi.cfg
 
 # Redirect root URL (/) to /nagios
 echo 'RedirectMatch ^/$ /nagios' >> /etc/apache2/apache2.conf
